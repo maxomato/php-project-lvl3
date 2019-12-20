@@ -1,0 +1,8 @@
+/vendor/
+.vagrant
+Vagrantfile
+*.log
+.idea
+clover.xml
+.env
+*.cache

@@ -1,4 +1,4 @@
-Application to analyze pages for seo
+Application to analyze seo pages
 ===========================
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/d77f71e28f8fd886a1a5/maintainability)](https://codeclimate.com/github/maxomato/php-project-lvl3/maintainability)

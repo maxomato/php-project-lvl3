@@ -18,3 +18,7 @@ test-coverage:
 
 log:
 	tail -f storage/logs/lumen.log
+
+migrate:
+	php artisan migrate
+

@@ -8,7 +8,7 @@ run:
 	php -S 0.0.0.0:8000 -t public
 
 lint:
-	composer run-script phpcs -- --standard=PSR12 app bootstrap public resources routes tests
+	composer run-script phpcs -- --standard=PSR12 app bootstrap public routes tests config
 
 test:
 	composer run-script phpunit tests

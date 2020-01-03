@@ -2,11 +2,13 @@ env:
   global:
     - CC_TEST_REPORTER_ID=97e58e1aa04002d2561fd1462c54d0abdc729902c1c795b22e1b6ae932ac04cc
 language: php
+services: postgresql
 install: make install
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
+  - psql -c 'create database travis_ci_test;' -U postgres
 script: make lint migrate test-coverage
 after_success:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

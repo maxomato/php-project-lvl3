@@ -3,12 +3,12 @@
 $url = parse_url(getenv("DATABASE_URL"));
 if ($url) {
     $host = $url["host"] ?? '127.0.0.1';
-    $username = $url["user"] ?? 'forge';
-    $password = $url["pass"] ?? 'forge';
+    $username = $url["user"] ?? 'postgres';
+    $password = $url["pass"] ?? 'postgres';
     $port = $url["port"] ?? 5432;
     $database = isset($url["path"])
         ? substr($url["path"], 1)
-        : 'forge';
+        : 'postgres';
 }
 
 return [

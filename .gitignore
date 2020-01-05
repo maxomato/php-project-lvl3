@@ -5,4 +5,5 @@ Vagrantfile
 .idea
 clover.xml
 *.cache
+.env
 database/database.sqlite

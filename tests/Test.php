@@ -18,7 +18,7 @@ class Test extends TestCase
     {
         $url = 'http://google.com';
         $params = [
-          'name' => $url
+          'url' => $url
         ];
         $this->call('POST', '/domains', $params);
 

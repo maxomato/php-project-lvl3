@@ -3,7 +3,7 @@ env:
     - CC_TEST_REPORTER_ID=97e58e1aa04002d2561fd1462c54d0abdc729902c1c795b22e1b6ae932ac04cc
     - APP_ENV=production
 language: php
-services: postgresql sqlite3
+services: postgresql
 install: make install
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

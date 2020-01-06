@@ -10,7 +10,7 @@ class Test extends TestCase
 
     public function testMainPage()
     {
-        $response = $this->call('GET', '/');
+        $response = $this->call('GET', route('domains.create'));
         $this->assertEquals(200, $response->status());
     }
 
@@ -20,9 +20,9 @@ class Test extends TestCase
         $params = [
           'url' => $url
         ];
-        $this->call('POST', '/domains', $params);
+        $this->call('POST', route('domains.store'), $params);
 
-        $response = $this->call('GET', '/domains/1');
+        $response = $this->call('GET', route('domains.show', ['id' => 1]));
         $this->assertEquals(200, $response->status());
 
         $this->seeInDatabase('domains', ['name' => $url]);

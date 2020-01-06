@@ -6,12 +6,17 @@ use Laravel\Lumen\Routing\Router;
  * @var Router $router
  */
 
-$router->get('/', function () {
-    return view('index');
-});
-
-$router->get('/domains/{id}', [
-    'as' => 'domain-view', 'uses' => 'Controller@domains'
+$router->get('/', [
+    'as' => 'domains.create',
+    'uses' => 'DomainController@create'
 ]);
 
-$router->post('/domains', 'Controller@domains');
+$router->get('/domains/{id}', [
+    'as' => 'domains.show',
+    'uses' => 'DomainController@show'
+]);
+
+$router->post('/domains', [
+    'as' => 'domains.store',
+    'uses' => 'DomainController@store'
+]);

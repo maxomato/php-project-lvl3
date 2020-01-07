@@ -5,7 +5,7 @@
 @section('content')
     <table class="table">
         <tr>
-            <th>Domain</th>
+            <th>Name</th>
             <th>Created</th>
             <th>Updated</th>
         </tr>

@@ -9,9 +9,16 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 
 class DomainController extends BaseController
 {
+    public function index()
+    {
+        $domains = DB::table('domains')->paginate(10);
+
+        return view('index', ['domains' => $domains]);
+    }
+
     public function create()
     {
-        return view('index');
+        return view('form');
     }
 
     public function show($id)

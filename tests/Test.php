@@ -27,4 +27,21 @@ class Test extends TestCase
 
         $this->seeInDatabase('domains', ['name' => $url]);
     }
+
+    public function testListDomains()
+    {
+        $urls = [
+            'http://google.com',
+            'http://yandex.ru'
+        ];
+        foreach ($urls as $index => $url) {
+            $this->call('POST', route('domains.store'), ['url' => $url]);
+
+            $response = $this->call('GET', route('domains.show', ['id' => $index + 1]));
+            $this->assertEquals(200, $response->status());
+        }
+
+        $response = $this->call('GET', route('domains.index'));
+        $this->assertEquals(200, $response->status());
+    }
 }

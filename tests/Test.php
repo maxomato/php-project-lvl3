@@ -37,8 +37,7 @@ class Test extends TestCase
         foreach ($urls as $index => $url) {
             $this->call('POST', route('domains.store'), ['url' => $url]);
 
-            $response = $this->call('GET', route('domains.show', ['id' => $index + 1]));
-            $this->assertEquals(200, $response->status());
+            $this->seeInDatabase('domains', ['name' => $url]);
         }
 
         $response = $this->call('GET', route('domains.index'));

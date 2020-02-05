@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\HttpClient;
+use App\Http\HttpClientInterface;
+use App\Tests\TestHttpClient;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -32,5 +36,17 @@ $app->router->group([
 ], function ($router) {
     require __DIR__ . '/../routes/web.php';
 });
+
+if ($app->environment('testing')) {
+    $app->bind(HttpClientInterface::class, function () {
+        return new TestHttpClient();
+    });
+} else {
+    $app->bind(HttpClientInterface::class, function () {
+        return new HttpClient();
+    });
+}
+
+
 
 return $app;

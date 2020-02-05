@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\HttpClientInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -9,6 +10,16 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 
 class DomainController extends BaseController
 {
+    /**
+     * @var HttpClientInterface
+     */
+    private $httpClient;
+
+    public function __construct(HttpClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     public function index()
     {
         $domains = DB::table('domains')->paginate(10);
@@ -30,6 +41,11 @@ class DomainController extends BaseController
 
     public function store(Request $request)
     {
+        if (env('APP_DEBUG')) {
+            // for debug bar
+            session_start();
+        }
+
         $url = $request->input('url');
         Validator::make($request->all(), [
             'url' => 'required|url'
@@ -39,9 +55,12 @@ class DomainController extends BaseController
 
         $id = DB::table('domains')->insertGetId([
             'name' => $url,
+            'state' => HttpClientInterface::STATE_INIT,
             'created_at' => $currentDateTime,
             'updated_at' => $currentDateTime
         ]);
+
+        $this->httpClient->send($id);
 
         return redirect()->route('domains.show', ['id' => $id]);
     }

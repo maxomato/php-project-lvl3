@@ -39,7 +39,7 @@ class HttpClient implements HttpClientInterface
                         'body' => $body
                     ]);
                 } catch (\Exception $e) {
-                    Log::debug($e->getMessage());
+                    Log::emergency($e->getMessage());
                 }
             },
             function (RequestException $e) use ($domainId) {

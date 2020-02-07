@@ -29,7 +29,7 @@ class HttpClient implements HttpClientInterface
         $promise = $this->client->requestAsync('GET', $domain->name);
         $state = $promise->then(
             function (ResponseInterface $response) use ($domainId) {
-                Log::info('after request');
+                Log::info('fullfiled after request');
 
                 try {
                     $status = $response->getStatusCode();
@@ -47,6 +47,8 @@ class HttpClient implements HttpClientInterface
                 }
             },
             function (RequestException $e) use ($domainId) {
+                Log::info('rejected after request');
+
                 if ($e->hasResponse()) {
                     $response = $e->getResponse();
                     $status = $response->getStatusCode();

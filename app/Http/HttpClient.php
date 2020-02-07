@@ -24,9 +24,13 @@ class HttpClient implements HttpClientInterface
             ->get()
             ->first();
 
+        Log::info('before request');
+
         $promise = $this->client->requestAsync('GET', $domain->name);
         $promise->then(
             function (ResponseInterface $response) use ($domainId) {
+                Log::info('after request');
+
                 try {
                     $status = $response->getStatusCode();
                     $body = $response->getBody();

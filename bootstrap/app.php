@@ -27,6 +27,11 @@ $app->singleton(
 if (env('APP_DEBUG')) {
     $app->register(Barryvdh\Debugbar\LumenServiceProvider::class);
     $app->configure('debugbar');
+
+    if ($app->environment('local')) {
+        // start session for redirect catch
+        session_start();
+    }
 }
 
 $app->withFacades();

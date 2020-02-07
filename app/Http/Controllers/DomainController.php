@@ -41,11 +41,6 @@ class DomainController extends BaseController
 
     public function store(Request $request)
     {
-        if (env('APP_DEBUG')) {
-            // for debug bar
-            session_start();
-        }
-
         $url = $request->input('url');
         Validator::make($request->all(), [
             'url' => 'required|url'

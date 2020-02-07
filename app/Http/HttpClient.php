@@ -27,7 +27,7 @@ class HttpClient implements HttpClientInterface
         Log::info('before request');
 
         $promise = $this->client->requestAsync('GET', $domain->name);
-        $promise->then(
+        $state = $promise->then(
             function (ResponseInterface $response) use ($domainId) {
                 Log::info('after request');
 
@@ -65,7 +65,9 @@ class HttpClient implements HttpClientInterface
                     ]);
                 }
             }
-        );
+        )->getState();
+
+        Log::info('promise state: ' . $state);
     }
 
     private function saveResponseData($domainId, $responseData)

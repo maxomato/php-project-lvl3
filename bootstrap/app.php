@@ -2,7 +2,6 @@
 
 use App\Http\HttpClient;
 use App\Http\HttpClientInterface;
-use App\Tests\TestHttpClient;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -42,16 +41,8 @@ $app->router->group([
     require __DIR__ . '/../routes/web.php';
 });
 
-if ($app->environment('testing')) {
-    $app->bind(HttpClientInterface::class, function () {
-        return new TestHttpClient();
-    });
-} else {
-    $app->bind(HttpClientInterface::class, function () {
-        return new HttpClient();
-    });
-}
-
-
+$app->bind(HttpClientInterface::class, function () {
+    return new HttpClient();
+});
 
 return $app;

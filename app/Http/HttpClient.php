@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Psr\Http\Message\ResponseInterface;
 
 class HttpClient implements HttpClientInterface
 {
@@ -24,61 +23,39 @@ class HttpClient implements HttpClientInterface
             ->get()
             ->first();
 
-        Log::info('before request');
+        try {
+            $response = $this->client->request('GET', $domain->name);
+            $status = $response->getStatusCode();
+            $body = $response->getBody();
+            $contentLength = strlen($body);
 
-        $promise = $this->client->requestAsync('GET', $domain->name);
-        $state = $promise->then(
-            function (ResponseInterface $response) use ($domainId) {
-                Log::info('fullfiled after request');
+            $responseData = [
+                'state' => self::STATE_COMPLETED,
+                'status' => $status,
+                'body' => $body,
+                'content_length' => $contentLength
+            ];
+        } catch (RequestException $e) {
+            $responseData = [
+                'state' => self::STATE_FAILED,
+            ];
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                $body = $response->getBody();
+                $contentLength = strlen($body);
 
-                try {
-                    $status = $response->getStatusCode();
-                    $body = $response->getBody();
-
-                    $contentLength = strlen($body);
-                    self::saveResponseData($domainId, [
-                        'state' => self::STATE_COMPLETED,
-                        'status' => $status,
-                        'content_length' => $contentLength,
-                        'body' => $body
-                    ]);
-                } catch (\Exception $e) {
-                    Log::emergency($e->getMessage());
-                }
-            },
-            function (RequestException $e) use ($domainId) {
-                Log::info('rejected after request');
-
-                if ($e->hasResponse()) {
-                    $response = $e->getResponse();
-                    $status = $response->getStatusCode();
-                    $body = $response->getBody();
-
-                    $contentLength = strlen($body);
-                    self::saveResponseData($domainId, [
-                        'state' => self::STATE_FAILED,
-                        'status' => $status,
-                        'content_length' => $contentLength,
-                        'body' => $body
-                    ]);
-                } else {
-                    self::saveResponseData($domainId, [
-                        'state' => self::STATE_FAILED,
-                    ]);
-                }
+                $responseData = array_merge($responseData, [
+                    'status' => $response->getStatusCode(),
+                    'body' => $body,
+                    'content_length' => $contentLength
+                ]);
             }
-        )->getState();
 
-        Log::info('promise state: ' . $state);
-    }
+            Log::emergency($e->getMessage());
+        }
 
-    private function saveResponseData($domainId, $responseData)
-    {
-        $updatedCount = DB::table('domains')
+        DB::table('domains')
             ->where('id', $domainId)
             ->update($responseData);
-        if (!$updatedCount) {
-            throw new \Exception('zero rows updated');
-        }
     }
 }

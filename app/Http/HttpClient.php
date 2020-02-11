@@ -26,7 +26,7 @@ class HttpClient implements HttpClientInterface
         try {
             $response = $this->client->request('GET', $domain->name);
             $status = $response->getStatusCode();
-            $body = $response->getBody();
+            $body = htmlspecialchars($response->getBody());
             $contentLength = strlen($body);
 
             $responseData = [
@@ -41,7 +41,7 @@ class HttpClient implements HttpClientInterface
             ];
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
-                $body = $response->getBody();
+                $body = htmlspecialchars($response->getBody());
                 $contentLength = strlen($body);
 
                 $responseData = array_merge($responseData, [

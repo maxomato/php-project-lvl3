@@ -27,10 +27,7 @@
                     {{ $domain->updated_at }}
                 </td>
                 <td>
-                    {{ $domain->state }}
-                    @if ($domain->status)
-                        : {{ $domain->status }}
-                    @endif
+                    {{ $domain->state . ($domain->status ? (': ' . $domain->status) : '') }}
                 </td>
                 <td>
                     {{ $domain->content_length }}

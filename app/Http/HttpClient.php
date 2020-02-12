@@ -23,16 +23,18 @@ class HttpClient implements HttpClientInterface
             ->get()
             ->first();
 
+        $specialCharsOptions = ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE;
         try {
             $response = $this->client->request('GET', $domain->name);
             $status = $response->getStatusCode();
-            $body = htmlspecialchars($response->getBody());
+            $body = $response->getBody();
             $contentLength = strlen($body);
+            $safeBody = htmlspecialchars($body, $specialCharsOptions);
 
             $responseData = [
                 'state' => self::STATE_COMPLETED,
                 'status' => $status,
-                'body' => $body,
+                'body' => $safeBody,
                 'content_length' => $contentLength
             ];
         } catch (RequestException $e) {
@@ -41,12 +43,13 @@ class HttpClient implements HttpClientInterface
             ];
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
-                $body = htmlspecialchars($response->getBody());
+                $body = $response->getBody();
                 $contentLength = strlen($body);
+                $safeBody = htmlspecialchars($body, $specialCharsOptions);
 
                 $responseData = array_merge($responseData, [
                     'status' => $response->getStatusCode(),
-                    'body' => $body,
+                    'body' => $safeBody,
                     'content_length' => $contentLength
                 ]);
             }

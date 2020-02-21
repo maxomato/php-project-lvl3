@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-use App\Http\HttpClientInterface;
+use App\Interfaces\HttpClientInterface;
 
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {

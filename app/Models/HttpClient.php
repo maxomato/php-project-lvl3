@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http;
+namespace App\Models;
 
+use App\Interfaces\HttpClientInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class HttpClient implements HttpClientInterface
@@ -16,26 +16,18 @@ class HttpClient implements HttpClientInterface
         $this->client = new Client();
     }
 
-    public function send($domainId)
+    public function send(string $url)
     {
-        $domain = DB::table('domains')
-            ->where(['id' => $domainId])
-            ->get()
-            ->first();
-
-        $specialCharsOptions = ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE;
         try {
-            $response = $this->client->request('GET', $domain->name);
+            $response = $this->client->request('GET', $url);
             $status = $response->getStatusCode();
             $body = $response->getBody();
-            $contentLength = strlen($body);
-            $safeBody = htmlspecialchars($body, $specialCharsOptions);
 
             $responseData = [
                 'state' => self::STATE_COMPLETED,
                 'status' => $status,
-                'body' => $safeBody,
-                'content_length' => $contentLength
+                'body' => $body->getContents(),
+                'content_length' => $body->getSize()
             ];
         } catch (RequestException $e) {
             $responseData = [
@@ -44,21 +36,17 @@ class HttpClient implements HttpClientInterface
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
                 $body = $response->getBody();
-                $contentLength = strlen($body);
-                $safeBody = htmlspecialchars($body, $specialCharsOptions);
 
                 $responseData = array_merge($responseData, [
                     'status' => $response->getStatusCode(),
-                    'body' => $safeBody,
-                    'content_length' => $contentLength
+                    'body' => $body->getContents(),
+                    'content_length' => $body->getSize()
                 ]);
             }
 
             Log::emergency($e->getMessage());
         }
 
-        DB::table('domains')
-            ->where('id', $domainId)
-            ->update($responseData);
+        return $responseData;
     }
 }

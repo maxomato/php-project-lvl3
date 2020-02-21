@@ -27,7 +27,8 @@
         "php": "^7.2",
         "laravel/lumen-framework": "^6.0",
         "guzzlehttp/guzzle": "~6.0",
-        "doctrine/dbal": "^2.10"
+        "doctrine/dbal": "^2.10",
+        "imangazaliev/didom": "^1.14"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.4",

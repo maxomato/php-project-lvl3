@@ -25,7 +25,12 @@ class Test extends TestCase
         $response = $this->call('GET', route('domains.show', ['id' => 1]));
         $this->assertEquals(200, $response->status());
 
-        $this->seeInDatabase('domains', ['name' => $url]);
+        $this->seeInDatabase('domains', [
+            'name' => $url,
+            'h1' => 'Header',
+            'description' => 'description',
+            'keywords' => 'keywords'
+        ]);
     }
 
     public function testListDomains()

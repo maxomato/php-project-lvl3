@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http;
+namespace App\Interfaces;
 
 interface HttpClientInterface
 {
@@ -8,5 +8,5 @@ interface HttpClientInterface
     public const STATE_COMPLETED = 'completed';
     public const STATE_FAILED = 'failed';
 
-    public function send($domainId);
+    public function send(string $url);
 }

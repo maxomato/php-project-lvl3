@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\HttpClientInterface;
+use App\Interfaces\HttpClientInterface;
+use App\Models\PageAnalyzer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,9 +16,15 @@ class DomainController extends BaseController
      */
     private $httpClient;
 
-    public function __construct(HttpClientInterface $httpClient)
+    /**
+     * @var PageAnalyzer
+     */
+    private $pageAnalyzer;
+
+    public function __construct(HttpClientInterface $httpClient, PageAnalyzer $pageAnalyzer)
     {
         $this->httpClient = $httpClient;
+        $this->pageAnalyzer = $pageAnalyzer;
     }
 
     public function index()
@@ -48,15 +55,32 @@ class DomainController extends BaseController
 
         $currentDateTime = date('d/M/Y H:i:s');
 
-        $id = DB::table('domains')->insertGetId([
+        $domainId = DB::table('domains')->insertGetId([
             'name' => $url,
             'state' => HttpClientInterface::STATE_INIT,
             'created_at' => $currentDateTime,
             'updated_at' => $currentDateTime
         ]);
 
-        $this->httpClient->send($id);
+        $domain = DB::table('domains')
+            ->where(['id' => $domainId])
+            ->get()
+            ->first();
 
-        return redirect()->route('domains.show', ['id' => $id]);
+        $responseData = $this->httpClient->send($domain->name);
+
+        if (array_key_exists('body', $responseData)) {
+            $parsedData = $this->pageAnalyzer->parsePage($responseData['body']);
+        } else {
+            $parsedData = [];
+        }
+
+        $updatedData = array_merge($responseData, $parsedData);
+
+        DB::table('domains')
+            ->where('id', $domainId)
+            ->update($updatedData);
+
+        return redirect()->route('domains.show', ['id' => $domainId]);
     }
 }

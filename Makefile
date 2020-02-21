@@ -22,6 +22,4 @@ log:
 migrate:
 	php artisan migrate --force
 
-release: install migrate
-
 

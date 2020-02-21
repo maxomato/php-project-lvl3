@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\HttpClient;
-use App\Http\HttpClientInterface;
+use App\Interfaces\HttpClientInterface;
+use App\Models\HttpClient;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

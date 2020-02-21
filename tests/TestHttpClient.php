@@ -2,15 +2,20 @@
 
 namespace App\Tests;
 
-use App\Http\HttpClientInterface;
-use Illuminate\Support\Facades\DB;
+use App\Interfaces\HttpClientInterface;
 
 class TestHttpClient implements HttpClientInterface
 {
-    public function send($domainId)
+    public function send(string $url)
     {
-        DB::table('domains')
-            ->where('id', $domainId)
-            ->update(['state' => self::STATE_COMPLETED]);
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'response.html';
+        $body = file_get_contents($path);
+
+        return [
+                'state' => self::STATE_COMPLETED,
+                'status' => 200,
+                'body' => $body,
+                'content_length' => strlen($body)
+        ];
     }
 }

@@ -10,6 +10,9 @@
             <th>Updated</th>
             <th>Response Status</th>
             <th>Content Length</th>
+            <th>H1</th>
+            <th>Keywords</th>
+            <th>Description</th>
         </tr>
         @foreach ($domains as $domain)
             <tr>
@@ -31,6 +34,15 @@
                 </td>
                 <td>
                     {{ $domain->content_length }}
+                </td>
+                <td>
+                    {{ $domain->h1 }}
+                </td>
+                <td>
+                    {{ $domain->keywords }}
+                </td>
+                <td>
+                    {{ $domain->description }}
                 </td>
             </tr>
         @endforeach

@@ -1,7 +1,7 @@
 <?php
 
-use App\Interfaces\HttpClientInterface;
-use App\Models\HttpClient;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -41,8 +41,8 @@ $app->router->group([
     require __DIR__ . '/../routes/web.php';
 });
 
-$app->bind(HttpClientInterface::class, function () {
-    return new HttpClient();
+$app->bind(ClientInterface::class, function () {
+    return new Client();
 });
 
 return $app;

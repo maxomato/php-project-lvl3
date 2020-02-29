@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\HttpClientInterface;
+use App\Models\HttpClient;
 use App\Models\PageAnalyzer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 class DomainController extends BaseController
 {
     /**
-     * @var HttpClientInterface
+     * @var HttpClient
      */
     private $httpClient;
 
@@ -21,7 +21,7 @@ class DomainController extends BaseController
      */
     private $pageAnalyzer;
 
-    public function __construct(HttpClientInterface $httpClient, PageAnalyzer $pageAnalyzer)
+    public function __construct(HttpClient $httpClient, PageAnalyzer $pageAnalyzer)
     {
         $this->httpClient = $httpClient;
         $this->pageAnalyzer = $pageAnalyzer;
@@ -31,19 +31,19 @@ class DomainController extends BaseController
     {
         $domains = DB::table('domains')->paginate(10);
 
-        return view('index', ['domains' => $domains]);
+        return view('domain.index', ['domains' => $domains]);
     }
 
     public function create()
     {
-        return view('form');
+        return view('domain.form');
     }
 
     public function show($id)
     {
         $domains = DB::table('domains')->where(['id' => $id])->get();
 
-        return view('view', ['domain' => $domains->first()]);
+        return view('domain.view', ['domain' => $domains->first()]);
     }
 
     public function store(Request $request)
@@ -57,17 +57,12 @@ class DomainController extends BaseController
 
         $domainId = DB::table('domains')->insertGetId([
             'name' => $url,
-            'state' => HttpClientInterface::STATE_INIT,
+            'state' => HttpClient::STATE_INIT,
             'created_at' => $currentDateTime,
             'updated_at' => $currentDateTime
         ]);
 
-        $domain = DB::table('domains')
-            ->where(['id' => $domainId])
-            ->get()
-            ->first();
-
-        $responseData = $this->httpClient->send($domain->name);
+        $responseData = $this->httpClient->send($url);
 
         if (array_key_exists('body', $responseData)) {
             $parsedData = $this->pageAnalyzer->parsePage($responseData['body']);

@@ -2,17 +2,10 @@
 
 namespace App\Tests;
 
-use App\Interfaces\HttpClientInterface;
-
 abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 {
     public function createApplication()
     {
-        $app = require __DIR__ . '/../bootstrap/app.php';
-        $app->bind(HttpClientInterface::class, function () {
-            return new TestHttpClient();
-        });
-
-        return $app;
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

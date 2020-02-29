@@ -2,18 +2,24 @@
 
 namespace App\Models;
 
-use App\Interfaces\HttpClientInterface;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
-class HttpClient implements HttpClientInterface
+class HttpClient
 {
+    public const STATE_INIT = 'init';
+    public const STATE_COMPLETED = 'completed';
+    public const STATE_FAILED = 'failed';
+
+    /**
+     * @var ClientInterface
+     */
     private $client;
 
-    public function __construct()
+    public function __construct(ClientInterface $client)
     {
-        $this->client = new Client();
+        $this->client = $client;
     }
 
     public function send(string $url)

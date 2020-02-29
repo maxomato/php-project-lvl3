@@ -37,9 +37,6 @@ class DomainControllerTest extends TestCase
 
         $this->call('POST', route('domains.store'), $params);
 
-        $response = $this->call('GET', route('domains.show', ['id' => 1]));
-        $this->assertEquals(200, $response->status());
-
         $this->seeInDatabase('domains', [
             'name' => $url,
             'h1' => 'Header',

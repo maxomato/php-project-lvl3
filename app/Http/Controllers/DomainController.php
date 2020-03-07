@@ -2,73 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HttpClient;
-use App\Models\PageAnalyzer;
+use DiDom\Document;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
 class DomainController extends BaseController
 {
     /**
-     * @var HttpClient
+     * @var ClientInterface
      */
     private $httpClient;
 
-    /**
-     * @var PageAnalyzer
-     */
-    private $pageAnalyzer;
-
-    public function __construct(HttpClient $httpClient, PageAnalyzer $pageAnalyzer)
+    public function __construct(ClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
-        $this->pageAnalyzer = $pageAnalyzer;
     }
 
-    public function index()
+    public function list()
     {
         $domains = DB::table('domains')->paginate(10);
 
-        return view('domain.index', ['domains' => $domains]);
+        return view('domain.list', ['domains' => $domains]);
     }
 
-    public function create()
+    public function form()
     {
         return view('domain.form');
     }
 
-    public function show($id)
+    public function view($id)
     {
-        $domains = DB::table('domains')->where(['id' => $id])->get();
+        $domain = DB::table('domains')->find($id);
 
-        return view('domain.view', ['domain' => $domains->first()]);
+        return view('domain.view', ['domain' => $domain]);
     }
 
-    public function store(Request $request)
+    public function create(Request $request)
     {
         $url = $request->input('url');
         Validator::make($request->all(), [
             'url' => 'required|url'
         ])->validate();
 
-        $currentDateTime = date('d/M/Y H:i:s');
+        $currentDateTime = Carbon::now()->format('d/M/Y H:i:s');
 
         $domainId = DB::table('domains')->insertGetId([
             'name' => $url,
-            'state' => HttpClient::STATE_INIT,
             'created_at' => $currentDateTime,
             'updated_at' => $currentDateTime
         ]);
 
-        $responseData = $this->httpClient->send($url);
-
-        if (array_key_exists('body', $responseData)) {
-            $parsedData = $this->pageAnalyzer->parsePage($responseData['body']);
-        } else {
-            $parsedData = [];
+        try {
+            $response = $this->httpClient->request('GET', $url);
+        } catch (RequestException $e) {
+            $response = $e->hasResponse()
+                ? $response = $e->getResponse()
+                : null;
+            Log::emergency($e->getMessage());
         }
+
+        $responseData = [
+            'state' => 'failed',
+            'body' => '',
+            'content_length' => 0
+        ];
+
+        if ($response) {
+            $body = $response->getBody();
+            $responseData = [
+                'state' => 'completed',
+                'status' => $response->getStatusCode(),
+                'body' => $body->getContents(),
+                'content_length' => $body->getSize()
+            ];
+        }
+
+        $parsedData = $this->parsePage($responseData['body']);
 
         $updatedData = array_merge($responseData, $parsedData);
 
@@ -76,6 +91,26 @@ class DomainController extends BaseController
             ->where('id', $domainId)
             ->update($updatedData);
 
-        return redirect()->route('domains.show', ['id' => $domainId]);
+        return redirect()->route('domains.view', ['id' => $domainId]);
+    }
+
+    private function parsePage($page)
+    {
+        $document = new Document($page);
+
+        $h1Element = $document->first('h1');
+        $h1 = $h1Element ? $h1Element->text() : '';
+
+        $keywordsElement = $document->first('meta[name="keywords"]');
+        $keywords = $keywordsElement ? $keywordsElement->attr('content') : '';
+
+        $descriptionElement = $document->first('meta[name="description"]');
+        $description = $descriptionElement ? $descriptionElement->attr('content') : '';
+
+        return [
+            'h1' => $h1,
+            'keywords' => $keywords,
+            'description' => $description
+        ];
     }
 }

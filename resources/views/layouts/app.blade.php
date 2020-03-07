@@ -18,7 +18,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="{!! route('domains.create') !!}">SEO Analyzer</a>
+    <a class="navbar-brand" href="{!! route('domains.form') !!}">SEO Analyzer</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="{!! route('domains.index') !!}">Urls</a>
+                <a class="nav-link" href="{!! route('domains.list') !!}">Urls</a>
             </li>
         </ul>
     </div>

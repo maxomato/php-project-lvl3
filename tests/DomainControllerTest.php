@@ -14,13 +14,12 @@ class DomainControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testMainPage()
+    public function testForm()
     {
-        $response = $this->call('GET', route('domains.create'));
-        $this->assertEquals(200, $response->status());
+        $this->get(route('domains.form'))->assertResponseOk();
     }
 
-    public function testAddDomain()
+    public function testCreateDomain()
     {
         $url = 'http://google.com';
         $params = [
@@ -35,7 +34,7 @@ class DomainControllerTest extends TestCase
            'body' => $body
         ]);
 
-        $this->call('POST', route('domains.store'), $params);
+        $this->post(route('domains.create'), $params);
 
         $this->seeInDatabase('domains', [
             'name' => $url,
@@ -57,8 +56,7 @@ class DomainControllerTest extends TestCase
             ]);
         }
 
-        $response = $this->call('GET', route('domains.index'));
-        $this->assertEquals(200, $response->status());
+        $this->get(route('domains.list'))->assertResponseOk();
     }
 
     /**

@@ -7,21 +7,21 @@ use Laravel\Lumen\Routing\Router;
  */
 
 $router->get('/', [
-    'as' => 'domains.create',
-    'uses' => 'DomainController@create'
+    'as' => 'domains.form',
+    'uses' => 'DomainController@form'
 ]);
 
 $router->get('/domains/{id}', [
-    'as' => 'domains.show',
-    'uses' => 'DomainController@show'
+    'as' => 'domains.view',
+    'uses' => 'DomainController@view'
 ]);
 
 $router->get('/domains', [
-    'as' => 'domains.index',
-    'uses' => 'DomainController@index'
+    'as' => 'domains.list',
+    'uses' => 'DomainController@list'
 ]);
 
 $router->post('/domains', [
-    'as' => 'domains.store',
-    'uses' => 'DomainController@store'
+    'as' => 'domains.create',
+    'uses' => 'DomainController@create'
 ]);

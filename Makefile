@@ -17,7 +17,7 @@ test-coverage:
 	composer run-script phpunit -- --coverage-clover clover.xml tests
 
 log:
-	tail -f storage/logs/lumen.log
+	tail -n 50 -f storage/logs/lumen.log
 
 migrate:
 	php artisan migrate --force

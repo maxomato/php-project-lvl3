@@ -10,16 +10,16 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
-class DomainControllerTest extends TestCase
+class DomainsControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testForm()
+    public function testNew()
     {
-        $this->get(route('domains.form'))->assertResponseOk();
+        $this->get(route('domains.new'))->assertResponseOk();
     }
 
-    public function testCreateDomain()
+    public function testCreate()
     {
         $url = 'http://google.com';
         $params = [
@@ -44,7 +44,7 @@ class DomainControllerTest extends TestCase
         ]);
     }
 
-    public function testListDomains()
+    public function testIndex()
     {
         $urls = [
             'http://google.com',
@@ -56,7 +56,7 @@ class DomainControllerTest extends TestCase
             ]);
         }
 
-        $this->get(route('domains.list'))->assertResponseOk();
+        $this->get(route('domains.index'))->assertResponseOk();
     }
 
     /**

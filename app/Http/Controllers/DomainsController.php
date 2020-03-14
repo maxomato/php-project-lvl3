@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
-class DomainController extends BaseController
+class DomainsController extends BaseController
 {
     /**
      * @var ClientInterface
@@ -24,23 +24,26 @@ class DomainController extends BaseController
         $this->httpClient = $httpClient;
     }
 
-    public function list()
+    public function index()
     {
         $domains = DB::table('domains')->paginate(10);
 
-        return view('domain.list', ['domains' => $domains]);
+        return view('domains.index', ['domains' => $domains]);
     }
 
-    public function form()
+    public function new()
     {
-        return view('domain.form');
+        return view('domains.new');
     }
 
-    public function view($id)
+    public function show($id)
     {
         $domain = DB::table('domains')->find($id);
+        if (!$domain) {
+            abort(404, 'Domain page is not found');
+        }
 
-        return view('domain.view', ['domain' => $domain]);
+        return view('domains.show', ['domain' => $domain]);
     }
 
     public function create(Request $request)
@@ -50,7 +53,7 @@ class DomainController extends BaseController
             'url' => 'required|url'
         ])->validate();
 
-        $currentDateTime = Carbon::now()->format('d/M/Y H:i:s');
+        $currentDateTime = Carbon::now();
 
         $domainId = DB::table('domains')->insertGetId([
             'name' => $url,
@@ -59,29 +62,24 @@ class DomainController extends BaseController
         ]);
 
         try {
-            $response = $this->httpClient->request('GET', $url);
+            $response = $this->httpClient->get($url);
         } catch (RequestException $e) {
-            $response = $e->hasResponse()
-                ? $response = $e->getResponse()
-                : null;
+            DB::table('domains')
+                ->where('id', $domainId)
+                ->update(['state' => 'failed']);
+
             Log::emergency($e->getMessage());
+
+            return redirect()->route('domains.show', ['id' => $domainId]);
         }
 
+        $body = $response->getBody();
         $responseData = [
-            'state' => 'failed',
-            'body' => '',
-            'content_length' => 0
+            'state' => 'completed',
+            'status' => $response->getStatusCode(),
+            'body' => $body->getContents(),
+            'content_length' => $body->getSize()
         ];
-
-        if ($response) {
-            $body = $response->getBody();
-            $responseData = [
-                'state' => 'completed',
-                'status' => $response->getStatusCode(),
-                'body' => $body->getContents(),
-                'content_length' => $body->getSize()
-            ];
-        }
 
         $parsedData = $this->parsePage($responseData['body']);
 
@@ -91,7 +89,7 @@ class DomainController extends BaseController
             ->where('id', $domainId)
             ->update($updatedData);
 
-        return redirect()->route('domains.view', ['id' => $domainId]);
+        return redirect()->route('domains.show', ['id' => $domainId]);
     }
 
     private function parsePage($page)

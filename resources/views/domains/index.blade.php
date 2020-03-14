@@ -17,7 +17,7 @@
         @foreach ($domains as $domain)
             <tr>
                 <td>
-                    <a href="{!! route('domains.view', ['id' => $domain->id]) !!}"
+                    <a href="{!! route('domains.show', ['id' => $domain->id]) !!}"
                        target="_blank"
                     >
                         {{ $domain->name }}

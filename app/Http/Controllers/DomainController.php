@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
-class DomainsController extends BaseController
+class DomainController extends BaseController
 {
     /**
      * @var ClientInterface
@@ -28,12 +28,12 @@ class DomainsController extends BaseController
     {
         $domains = DB::table('domains')->paginate(10);
 
-        return view('domains.index', ['domains' => $domains]);
+        return view('domain.index', ['domains' => $domains]);
     }
 
     public function new()
     {
-        return view('domains.new');
+        return view('domain.new');
     }
 
     public function show($id)
@@ -43,7 +43,7 @@ class DomainsController extends BaseController
             abort(404, 'Domain page is not found');
         }
 
-        return view('domains.show', ['domain' => $domain]);
+        return view('domain.show', ['domain' => $domain]);
     }
 
     public function create(Request $request)
@@ -70,7 +70,7 @@ class DomainsController extends BaseController
 
             Log::emergency($e->getMessage());
 
-            return redirect()->route('domains.show', ['id' => $domainId]);
+            return redirect()->route('domain.show', ['id' => $domainId]);
         }
 
         $body = $response->getBody();
@@ -89,7 +89,7 @@ class DomainsController extends BaseController
             ->where('id', $domainId)
             ->update($updatedData);
 
-        return redirect()->route('domains.show', ['id' => $domainId]);
+        return redirect()->route('domain.show', ['id' => $domainId]);
     }
 
     private function parsePage($page)

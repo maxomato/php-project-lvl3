@@ -7,25 +7,25 @@ use Laravel\Lumen\Routing\Router;
  */
 
 $router->get('/', function () {
-    return redirect()->route('domains.new');
+    return redirect()->route('domain.new');
 });
 
-$router->get('/domains', [
-    'as' => 'domains.index',
-    'uses' => 'DomainsController@index'
+$router->get('/domain', [
+    'as' => 'domain.index',
+    'uses' => 'DomainController@index'
 ]);
 
-$router->get('/domains/new', [
-    'as' => 'domains.new',
-    'uses' => 'DomainsController@new'
+$router->get('/domain/new', [
+    'as' => 'domain.new',
+    'uses' => 'DomainController@new'
 ]);
 
-$router->post('/domains', [
-    'as' => 'domains.create',
-    'uses' => 'DomainsController@create'
+$router->post('/domain', [
+    'as' => 'domain.create',
+    'uses' => 'DomainController@create'
 ]);
 
-$router->get('/domains/{id}', [
-    'as' => 'domains.show',
-    'uses' => 'DomainsController@show'
+$router->get('/domain/{id}', [
+    'as' => 'domain.show',
+    'uses' => 'DomainController@show'
 ]);
